@@ -15,13 +15,7 @@ const client = new OneSignal.DefaultApi(configuration);
 const notification = new OneSignal.Notification();
 notification.app_id = "1a466f9c-d32b-4820-80c6-7e362344123c";
 
-
-cron.schedule("0-59 6-21/4 * * *", () => {
-  // Every 4 hours between 6 am and 10 pm
-  getUserData();
-});
-
-
+getUserData();
 
 function getUserData() {
   const deviceUrl =
