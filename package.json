@@ -1,0 +1,21 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@onesignal/node-onesignal": "^2.0.1-beta2",
+    "https": "^1.0.0",
+    "ipapi.co": "^0.3.0",
+    "moment-timezone": "^0.5.45",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
+    "onesignal-node": "^3.4.0"
+  }
+}
