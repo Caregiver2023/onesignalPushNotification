@@ -1,9 +1,9 @@
 const OneSignal = require("@onesignal/node-onesignal");
 const fetch = require("node-fetch");
-var ipapi = require("ipapi.co");
 const cron = require("node-cron");
-const moment = require("moment-timezone");
 var https = require("https");
+const { DateTime } = require("luxon");
+
 
 const configuration = OneSignal.createConfiguration({
   userKey: "NjdlODlhZTQtODJjMC00YTNjLWE3MmQtZjU3MDU4YzNlOTZj",
@@ -15,7 +15,13 @@ const client = new OneSignal.DefaultApi(configuration);
 const notification = new OneSignal.Notification();
 notification.app_id = "1a466f9c-d32b-4820-80c6-7e362344123c";
 
-getUserData();
+
+cron.schedule("0-59 6-21/4 * * *", () => {
+  // Every 4 hours between 6 am and 10 pm
+  getUserData();
+});
+
+
 
 function getUserData() {
   const deviceUrl =
@@ -71,50 +77,54 @@ function passInfo(id, ip) {
 
 // Function to send push notification
 function sendPushNotification(deviceId, userTimezone) {
-  const currentTime = moment().tz(userTimezone);
-  const randomHour = Math.floor(Math.random() * (22 - 6) + 6); // Random hour between 6 am and 10 pm
-  const randomMinute = Math.floor(Math.random() * 60); // Random minute
-
-  let year = moment().tz(userTimezone).year();
-  let month = moment().tz(userTimezone).month();
-  let day = moment().tz(userTimezone).date();
-  //let dates = date + " " +randomHour + ":" + randomMinute + ":00";
-  let timeStamp = moment({
-    year: year,
-    month: month,
-    day: day,
-    hour: randomHour,
-    minute: randomMinute,
-  })
-    .tz(userTimezone)
-    .format();
-
-  // console.log("dates: " + timeStamp);
+  const currentTime = DateTime.now().setZone(userTimezone);
+  const hour = currentTime.hour;
+  let randomHour = 6;  
   
-  //console.log("time", timeStamp);
- 
+  // Random minute
+  let randomMinute = Math.floor(Math.random() * 60); 
+  // Random date
+  let year = currentTime.year;
+  let month = currentTime.month;
+  let day = currentTime.day;
 
-  // Send push notification if the current time is before 10 pm
-  if (currentTime.hour() < 22) {
-    // Name property may be required in some case, for instance when sending an SMS.
-    notification.name = "test_notification_name";
-    notification.contents = {
-      en: "Hello! It’s time for you to take another quick survey and sync your Garmin watch. You rock!",
-    };
-
-    // required for Huawei
-    notification.headings = {
-      en: "Caregiver Wellbeing",
-    };
-    // this function uses for trigger notification at a specific time
-    notification.send_after = timeStamp;
-    
-    // This example target individual users, but you can also use filters or segments
-    // https://documentation.onesignal.com/reference/create-notification
-    notification.include_player_ids = [deviceId]
-    client.createNotification(notification).then((res) => {
-      console.log(res);
-    });
+  //Random hour
+  if(hour >= 6 && hour <= 9) {
+      randomHour = Math.floor(Math.random() * (9 - hour) + hour);
+      let timeStamp = DateTime.fromObject({year: year, month: month,day: day, hour: hour, minute: randomMinute }, { zone: userTimezone, numberingSystem: 'beng'}).toISO();
+      sendNotification (deviceId, timeStamp);
+  } else if(hour >= 10 && hour <= 13) {
+    randomHour = Math.floor(Math.random() * (13 - hour) + hour);
+    let timeStamp = DateTime.fromObject({year: year, month: month,day: day, hour: hour, minute: randomMinute }, { zone: userTimezone, numberingSystem: 'beng'}).toISO();
+    sendNotification (deviceId, timeStamp);
+  } else if(hour >= 14 && hour <= 17) {
+    randomHour = Math.floor(Math.random() * (17 - hour) + hour);
+    let timeStamp = DateTime.fromObject({year: year, month: month,day: day, hour: hour, minute: randomMinute }, { zone: userTimezone, numberingSystem: 'beng'}).toISO();
+    sendNotification (deviceId, timeStamp);
+  } else if(hour >= 18 && hour <= 21) {
+    randomHour = Math.floor(Math.random() * (21 - hour) + hour);
+    let timeStamp = DateTime.fromObject({year: year, month: month,day: day, hour: hour, minute: randomMinute }, { zone: userTimezone, numberingSystem: 'beng'}).toISO();
+    sendNotification (deviceId, timeStamp);
   }
 }
 
+function sendNotification (deviceId, timeStamp) {
+  console.log("timeStamp: ", timeStamp, " deviceId: ", deviceId);
+  notification.name = "Caregiver Wellbeing from API";
+  notification.contents = {
+    en: "Hello! It’s time for you to take another quick survey and sync your Garmin watch. You rock!",
+  };
+  notification.headings = {
+    en: "Caregiver Wellbeing from API",
+  };
+  
+  // this function uses for trigger notification at a specific time
+  notification.send_after = timeStamp;
+
+  // This example target individual users, but you can also use filters or segments
+  // https://documentation.onesignal.com/reference/create-notification
+  notification.include_player_ids = [deviceId]
+  client.createNotification(notification).then((res) => {
+    console.log(res);
+  })
+}
