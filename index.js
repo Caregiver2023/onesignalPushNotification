@@ -21,9 +21,6 @@ cron.schedule("0-59 6-21/4 * * *", () => {
   getUserData();
 });
 
-yarn start
-
-
 function getUserData() {
   const deviceUrl =
     "https://onesignal.com/api/v1/players?app_id=1a466f9c-d32b-4820-80c6-7e362344123c";
