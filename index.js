@@ -21,6 +21,7 @@ cron.schedule("0-59 6-21/4 * * *", () => {
   getUserData();
 });
 
+yarn start
 
 
 function getUserData() {
